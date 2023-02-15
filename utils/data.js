@@ -2,6 +2,7 @@ const data = {
     products: [
         {
             name: 'free shirt',
+            slug: 'free-shirt',
             category: 'shirts',
             image: '/images/shirt1.jpg',
             price: 70,
@@ -13,6 +14,7 @@ const data = {
         },
         {
             name: 'fit shirt',
+            slug: 'fit-shirt',
             category: 'shirts',
             image: '/images/shirt2.jpg',
             price: 70,
@@ -24,6 +26,7 @@ const data = {
         },
         {
             name: 'slim shirt',
+            slug: 'slim-shirt',
             category: 'shirts',
             image: '/images/shirt3.jpg',
             price: 90,
@@ -35,6 +38,7 @@ const data = {
         },
         {
             name: 'golf pants',
+            slug: 'golf-pants',
             category: 'pants',
             image: '/images/pants1.jpg',
             price: 70,
@@ -46,6 +50,7 @@ const data = {
         },
         {
             name: 'fit pants',
+            slug: 'fit-pants',
             category: 'shirts',
             image: '/images/pants2.jpg',
             price: 95,
@@ -57,6 +62,7 @@ const data = {
         },
         {
             name: 'classic pants',
+            slug: 'classic-pants',
             category: 'pants',
             image: '/images/pants3.jpg',
             price: 100,
