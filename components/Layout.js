@@ -6,12 +6,19 @@ import {
     Typography,
     CssBaseline,
     createTheme,
+    Switch,
 } from '@mui/material';
 import useStyles from '@/utils/styles';
 import NextLink from 'next/link';
 import { ThemeProvider } from '@mui/material/styles';
+import { useContext } from 'react';
+import { Store } from '@/utils/Store';
+import { DARK_MODE_OFF, DARK_MODE_ON } from '@/constants/types';
+import Cookies from 'js-cookie';
 
 export default function Layout({ children, title, description }) {
+    const { state, dispatch } = useContext(Store);
+    const { darkMode } = state;
     const classes = useStyles();
     const theme = createTheme({
         typography: {
@@ -27,7 +34,7 @@ export default function Layout({ children, title, description }) {
             },
         },
         palette: {
-            type: 'light',
+            mode: darkMode ? 'dark' : 'light',
             primary: {
                 main: '#f0c000',
             },
@@ -36,6 +43,12 @@ export default function Layout({ children, title, description }) {
             },
         },
     });
+
+    const darkModeChangeHandler = () => {
+        dispatch({ type: darkMode ? DARK_MODE_OFF : DARK_MODE_ON });
+        const newDarkMode = !darkMode;
+        Cookies.set('darkMode', newDarkMode ? 'ON' : 'OFF');
+    };
 
     return (
         <div>
@@ -58,6 +71,10 @@ export default function Layout({ children, title, description }) {
                         </NextLink>
                         <div className={classes.grow}></div>
                         <div>
+                            <Switch
+                                checked={darkMode}
+                                onChange={darkModeChangeHandler}
+                            ></Switch>
                             <NextLink href="/cart">Cart</NextLink>
                             <NextLink href="/login">Login</NextLink>
                         </div>
