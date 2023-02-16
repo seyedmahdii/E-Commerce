@@ -19,7 +19,12 @@ export default class MyDocument extends Document {
     render() {
         return (
             <Html lang="en">
-                <Head></Head>
+                <Head>
+                    <link
+                        rel="stylesheet"
+                        href="https://gonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+                    />
+                </Head>
                 <body>
                     <Main />
                     <NextScript />

@@ -40,7 +40,8 @@ export default function ProductScreen() {
                 <Grid item md={3} xs={12}>
                     <List>
                         <ListItem>
-                            <Typography component="h1">
+                            {/* set variant to "h1" to use the theme */}
+                            <Typography component="h1" variant="h1">
                                 {product.name}
                             </Typography>
                         </ListItem>
