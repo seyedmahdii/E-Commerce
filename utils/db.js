@@ -42,5 +42,13 @@ const disconnect = async () => {
     }
 };
 
-const db = { connect, disconnect };
+// Converts mongoose document to pure javascript object that contains only number, boolean, and string data type.
+const convertDocToObj = (doc) => {
+    doc._id = doc._id.toString();
+    doc.createdAt = doc.createdAt.toString();
+    doc.updatedAt = doc.updatedAt.toString();
+    return doc;
+};
+
+const db = { connect, disconnect, convertDocToObj };
 export default db;

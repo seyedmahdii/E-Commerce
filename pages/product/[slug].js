@@ -1,15 +1,17 @@
 import Layout from '@/components/Layout';
-import data from '@/utils/data';
-import { useRouter } from 'next/router';
+// import data from '@/utils/data';
+// import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 import useStyles from '@/utils/styles';
 import { Grid, List, ListItem, Typography, Card, Button } from '@mui/material';
 import Image from 'next/image';
+import db from '@/utils/db';
+import Product from '@/models/Product';
 
-export default function ProductScreen() {
-    const router = useRouter();
-    const { slug } = router.query;
-    const product = data.products.find((product) => product.slug === slug);
+export default function ProductScreen({ product }) {
+    // const router = useRouter();
+    // const { slug } = router.query;
+    // const product = data.products.find((product) => product.slug === slug);
     const classes = useStyles();
 
     if (!product) {
@@ -110,4 +112,18 @@ export default function ProductScreen() {
             </Grid>
         </Layout>
     );
+}
+
+export async function getServerSideProps(context) {
+    const {
+        params: { slug },
+    } = context;
+    await db.connect();
+    const product = await Product.findOne({ slug }).lean();
+    await db.disconnect();
+    return {
+        props: {
+            product: db.convertDocToObj(product),
+        },
+    };
 }
