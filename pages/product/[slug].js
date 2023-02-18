@@ -7,12 +7,26 @@ import { Grid, List, ListItem, Typography, Card, Button } from '@mui/material';
 import Image from 'next/image';
 import db from '@/utils/db';
 import Product from '@/models/Product';
+import axios from 'axios';
+import { CART_ADD_ITEM } from '@/constants/types';
+import { useContext } from 'react';
+import { Store } from '@/utils/Store';
 
 export default function ProductScreen({ product }) {
     // const router = useRouter();
     // const { slug } = router.query;
     // const product = data.products.find((product) => product.slug === slug);
     const classes = useStyles();
+    const { dispatch } = useContext(Store);
+
+    const addToCartHandler = async () => {
+        const { data } = await axios.get(`/api/products/${product._id}`);
+        if (data.countInStock <= 0) {
+            alert('Product is out of stock!');
+            return;
+        }
+        dispatch({ type: CART_ADD_ITEM, payload: { ...product, quantity: 1 } });
+    };
 
     if (!product) {
         return (
@@ -102,6 +116,7 @@ export default function ProductScreen({ product }) {
                                     fullWidth
                                     variant="contained"
                                     color="primary"
+                                    onClick={addToCartHandler}
                                 >
                                     Add to cart
                                 </Button>
