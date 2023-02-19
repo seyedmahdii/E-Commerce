@@ -1,4 +1,9 @@
-import { DARK_MODE_ON, DARK_MODE_OFF, CART_ADD_ITEM } from '@/constants/types';
+import {
+    DARK_MODE_ON,
+    DARK_MODE_OFF,
+    CART_ADD_ITEM,
+    CART_REMOVE_ITEM,
+} from '@/constants/types';
 import Cookies from 'js-cookie';
 import { createContext, useReducer } from 'react';
 
@@ -28,6 +33,13 @@ const reducer = (state, action) => {
                       item.name === existItem.name ? newItem : item
                   )
                 : [...state.cart.cartItems, newItem];
+            Cookies.set('cartItems', JSON.stringify(cartItems));
+            return { ...state, cart: { ...state.cart, cartItems } };
+        }
+        case CART_REMOVE_ITEM: {
+            const cartItems = state.cart.cartItems.filter(
+                (item) => item._id !== action.payload._id
+            );
             Cookies.set('cartItems', JSON.stringify(cartItems));
             return { ...state, cart: { ...state.cart, cartItems } };
         }

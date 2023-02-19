@@ -11,21 +11,28 @@ import axios from 'axios';
 import { CART_ADD_ITEM } from '@/constants/types';
 import { useContext } from 'react';
 import { Store } from '@/utils/Store';
+import { useRouter } from 'next/router';
 
 export default function ProductScreen({ product }) {
     // const router = useRouter();
     // const { slug } = router.query;
     // const product = data.products.find((product) => product.slug === slug);
     const classes = useStyles();
-    const { dispatch } = useContext(Store);
+    const { state, dispatch } = useContext(Store);
+    const router = useRouter();
 
     const addToCartHandler = async () => {
+        const existItem = state.cart.cartItems.find(
+            (item) => item._id === product._id
+        );
+        const quantity = existItem ? existItem.quantity + 1 : 1;
         const { data } = await axios.get(`/api/products/${product._id}`);
-        if (data.countInStock <= 0) {
+        if (quantity > data.countInStock) {
             alert('Product is out of stock!');
             return;
         }
-        dispatch({ type: CART_ADD_ITEM, payload: { ...product, quantity: 1 } });
+        dispatch({ type: CART_ADD_ITEM, payload: { ...product, quantity } });
+        router.push('/cart');
     };
 
     if (!product) {
