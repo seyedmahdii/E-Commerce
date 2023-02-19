@@ -23,13 +23,14 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import axios from 'axios';
 import { CART_ADD_ITEM, CART_REMOVE_ITEM } from '@/constants/types';
+import { useRouter } from 'next/router';
 
 function CartScreen() {
     const { state, dispatch } = useContext(Store);
     const {
         cart: { cartItems },
     } = state;
-    console.log(cartItems);
+    const router = useRouter();
 
     const updateCartHandler = async (item, quantity) => {
         const { data } = await axios.get(`/api/products/${item._id}`);
@@ -42,6 +43,10 @@ function CartScreen() {
 
     const removeItemHandler = (item) => {
         dispatch({ type: CART_REMOVE_ITEM, payload: item });
+    };
+
+    const checkoutHandler = () => {
+        router.push('/shipping');
     };
 
     return (
@@ -168,6 +173,7 @@ function CartScreen() {
                                         variant="contained"
                                         color="primary"
                                         fullWidth
+                                        onClick={checkoutHandler}
                                     >
                                         Check Out
                                     </Button>
