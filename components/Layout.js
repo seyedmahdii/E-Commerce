@@ -8,18 +8,22 @@ import {
     createTheme,
     Switch,
     Badge,
+    Button,
+    Menu,
+    MenuItem,
 } from '@mui/material';
 import useStyles from '@/utils/styles';
 import NextLink from 'next/link';
 import { ThemeProvider } from '@mui/material/styles';
 import { useContext, useState, useEffect } from 'react';
 import { Store } from '@/utils/Store';
-import { DARK_MODE_OFF, DARK_MODE_ON } from '@/constants/types';
+import { DARK_MODE_OFF, DARK_MODE_ON, USER_LOGOUT } from '@/constants/types';
 import Cookies from 'js-cookie';
+import { useRouter } from 'next/router';
 
 export default function Layout({ children, title, description }) {
     const { state, dispatch } = useContext(Store);
-    const { darkMode, cart } = state;
+    const { darkMode, cart, userInfo } = state;
     const classes = useStyles();
     const theme = createTheme({
         typography: {
@@ -45,6 +49,8 @@ export default function Layout({ children, title, description }) {
         },
     });
     const [cartItemsLength, setCartItemsLength] = useState(0);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const router = useRouter();
 
     const darkModeChangeHandler = () => {
         dispatch({ type: darkMode ? DARK_MODE_OFF : DARK_MODE_ON });
@@ -52,7 +58,23 @@ export default function Layout({ children, title, description }) {
         Cookies.set('darkMode', newDarkMode ? 'ON' : 'OFF');
     };
 
-    // This is used to fix the "React Hydration Error"
+    const loginClickHandler = (e) => {
+        setAnchorEl(e.currentTarget);
+    };
+
+    const loginMenuCloseHandler = () => {
+        setAnchorEl(null);
+    };
+
+    const logoutClickHandler = () => {
+        Cookies.remove('userInfo');
+        Cookies.remove('cartItems');
+        dispatch({ type: USER_LOGOUT });
+        loginMenuCloseHandler();
+        router.push('/');
+    };
+
+    // This is used to fix the "React Hydration Error   "
     useEffect(() => {
         setCartItemsLength(cart.cartItems.length);
     }, [cart.cartItems.length]);
@@ -94,7 +116,41 @@ export default function Layout({ children, title, description }) {
                                     'Cart'
                                 )}
                             </NextLink>
-                            <NextLink href="/login">Login</NextLink>
+                            {userInfo ? (
+                                <>
+                                    <Button
+                                        className={classes.navbarButton}
+                                        aria-controls="menu"
+                                        aria-haspopup="true"
+                                        onClick={loginClickHandler}
+                                    >
+                                        {userInfo.name}
+                                    </Button>
+                                    <Menu
+                                        id="menu"
+                                        anchorEl={anchorEl}
+                                        keepMounted
+                                        open={Boolean(anchorEl)}
+                                        onClose={loginMenuCloseHandler}
+                                    >
+                                        <MenuItem
+                                            onClick={loginMenuCloseHandler}
+                                        >
+                                            Profile
+                                        </MenuItem>
+                                        <MenuItem
+                                            onClick={loginMenuCloseHandler}
+                                        >
+                                            My account
+                                        </MenuItem>
+                                        <MenuItem onClick={logoutClickHandler}>
+                                            Logout
+                                        </MenuItem>
+                                    </Menu>
+                                </>
+                            ) : (
+                                <NextLink href="/login">Login</NextLink>
+                            )}
                         </div>
                     </Toolbar>
                 </AppBar>

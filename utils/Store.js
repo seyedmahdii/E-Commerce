@@ -3,6 +3,8 @@ import {
     DARK_MODE_OFF,
     CART_ADD_ITEM,
     CART_REMOVE_ITEM,
+    USER_LOGIN,
+    USER_LOGOUT,
 } from '@/constants/types';
 import Cookies from 'js-cookie';
 import { createContext, useReducer } from 'react';
@@ -15,6 +17,9 @@ const initialState = {
             ? JSON.parse(Cookies.get('cartItems'))
             : [],
     },
+    userInfo: Cookies.get('userInfo')
+        ? JSON.parse(Cookies.get('userInfo'))
+        : null,
 };
 
 const reducer = (state, action) => {
@@ -43,6 +48,12 @@ const reducer = (state, action) => {
             Cookies.set('cartItems', JSON.stringify(cartItems));
             return { ...state, cart: { ...state.cart, cartItems } };
         }
+        case USER_LOGIN: {
+            const user = action.payload;
+            return { ...state, userInfo: user };
+        }
+        case USER_LOGOUT:
+            return { ...state, userInfo: null, cart: { cartItems: [] } };
         default:
             return state;
     }

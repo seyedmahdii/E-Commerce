@@ -1,4 +1,6 @@
 import Layout from '@/components/Layout';
+import { USER_LOGIN } from '@/constants/types';
+import { Store } from '@/utils/Store';
 import useStyles from '@/utils/styles';
 import {
     Button,
@@ -9,13 +11,20 @@ import {
     Typography,
 } from '@mui/material';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import NextLink from 'next/link';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
 
 export default function LoginScreen() {
     const classes = useStyles();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { state, dispatch } = useContext(Store);
+    const { userInfo } = state;
+    const router = useRouter();
+    const { redirect } = router.query;
+    console.log('redirect', redirect);
 
     const submitHandler = async (e) => {
         e.preventDefault();
@@ -25,16 +34,24 @@ export default function LoginScreen() {
                 email,
                 password,
             });
-            console.log('login success');
+            dispatch({ type: USER_LOGIN, payload: data });
+            Cookies.set('userInfo', JSON.stringify(data));
+            router.push(redirect || '/');
         } catch (error) {
             console.log(
                 'Error loging in!',
-                error.response.data
-                    ? error.response.data.message
+                error.response?.data
+                    ? error.response.data?.message
                     : error.message
             );
         }
     };
+
+    useEffect(() => {
+        if (userInfo) {
+            router.push('/');
+        }
+    }, [router, userInfo]);
 
     return (
         <Layout title="Login">
