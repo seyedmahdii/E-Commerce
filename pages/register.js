@@ -1,5 +1,5 @@
 import Layout from '@/components/Layout';
-import { USER_LOGIN } from '@/constants/types';
+import { USER_REGISTER } from '@/constants/types';
 import { Store } from '@/utils/Store';
 import useStyles from '@/utils/styles';
 import {
@@ -16,10 +16,14 @@ import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
     const classes = useStyles();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+    });
     const { state, dispatch } = useContext(Store);
     const { userInfo } = state;
     const router = useRouter();
@@ -28,22 +32,34 @@ export default function LoginScreen() {
     const submitHandler = async (e) => {
         e.preventDefault();
 
+        if (formData.password !== formData.confirmPassword) {
+            alert("Passwords don't match!");
+            return;
+        }
+
         try {
-            const { data } = await axios.post('/api/users/login', {
-                email,
-                password,
+            const { data } = await axios.post('/api/users/register', {
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
             });
-            dispatch({ type: USER_LOGIN, payload: data });
+            dispatch({ type: USER_REGISTER, payload: data });
             Cookies.set('userInfo', JSON.stringify(data));
             router.push(redirect || '/');
         } catch (error) {
             console.log(
-                'Error loging in!',
+                'Error Registering!',
                 error.response?.data
                     ? error.response.data?.message
                     : error.message
             );
         }
+    };
+
+    const changeHandler = (e) => {
+        const name = e.target.name;
+        const value = e.target.value;
+        setFormData({ ...formData, [name]: value });
     };
 
     useEffect(() => {
@@ -53,12 +69,23 @@ export default function LoginScreen() {
     }, [router, userInfo]);
 
     return (
-        <Layout title="Login">
+        <Layout title="Register">
             <form onSubmit={submitHandler} className={classes.form}>
                 <Typography component="h1" variant="h1">
-                    Login
+                    Register
                 </Typography>
                 <List>
+                    <ListItem>
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            id="name"
+                            label="Name"
+                            inputProps={{ type: 'name' }}
+                            name="name"
+                            onChange={changeHandler}
+                        />
+                    </ListItem>
                     <ListItem>
                         <TextField
                             variant="outlined"
@@ -66,7 +93,8 @@ export default function LoginScreen() {
                             id="email"
                             label="Email"
                             inputProps={{ type: 'email' }}
-                            onChange={(e) => setEmail(e.target.value)}
+                            name="email"
+                            onChange={changeHandler}
                         />
                     </ListItem>
                     <ListItem>
@@ -76,7 +104,19 @@ export default function LoginScreen() {
                             id="password"
                             label="Password"
                             inputProps={{ type: 'password' }}
-                            onChange={(e) => setPassword(e.target.value)}
+                            name="password"
+                            onChange={changeHandler}
+                        />
+                    </ListItem>
+                    <ListItem>
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            id="confirmPassword"
+                            label="Confirm Password"
+                            inputProps={{ type: 'password' }}
+                            name="confirmPassword"
+                            onChange={changeHandler}
                         />
                     </ListItem>
                     <ListItem>
@@ -86,16 +126,16 @@ export default function LoginScreen() {
                             type="submit"
                             fullWidth
                         >
-                            Login
+                            Register
                         </Button>
                     </ListItem>
                     <ListItem>
-                        Don&apos;t have an account? &nbsp;
+                        Already have an account? &nbsp;
                         <NextLink
-                            href={`/register?redirect=${redirect || '/'}`}
+                            href={`/login?redirect=${redirect || '/'}`}
                             passHref
                         >
-                            <Link>Register</Link>
+                            <Link>Login</Link>
                         </NextLink>
                     </ListItem>
                 </List>
