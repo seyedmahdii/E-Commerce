@@ -5,6 +5,7 @@ import {
     CART_REMOVE_ITEM,
     USER_LOGIN,
     USER_LOGOUT,
+    SAVE_SHIPPING_ADDRESS,
 } from '@/constants/types';
 import Cookies from 'js-cookie';
 import { createContext, useReducer } from 'react';
@@ -16,6 +17,9 @@ const initialState = {
         cartItems: Cookies.get('cartItems')
             ? JSON.parse(Cookies.get('cartItems'))
             : [],
+        shippingAddress: Cookies.get('shippingAddress')
+            ? JSON.parse(Cookies.get('shippingAddress'))
+            : {},
     },
     userInfo: Cookies.get('userInfo')
         ? JSON.parse(Cookies.get('userInfo'))
@@ -54,6 +58,11 @@ const reducer = (state, action) => {
         }
         case USER_LOGOUT:
             return { ...state, userInfo: null, cart: { cartItems: [] } };
+        case SAVE_SHIPPING_ADDRESS:
+            return {
+                ...state,
+                cart: { ...state.cart, shippingAddress: action.payload },
+            };
         default:
             return state;
     }

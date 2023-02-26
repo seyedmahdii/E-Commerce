@@ -100,7 +100,7 @@ export default function RegisterScreen() {
                                         errors.name
                                             ? errors.name.type === 'minLength'
                                                 ? 'Name length is more than 1'
-                                                : 'Email is required'
+                                                : 'Name is required'
                                             : ''
                                     }
                                     {...field}
