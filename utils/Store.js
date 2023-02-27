@@ -6,6 +6,7 @@ import {
     USER_LOGIN,
     USER_LOGOUT,
     SAVE_SHIPPING_ADDRESS,
+    SAVE_PAYMENT_METHOD,
 } from '@/constants/types';
 import Cookies from 'js-cookie';
 import { createContext, useReducer } from 'react';
@@ -62,6 +63,11 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 cart: { ...state.cart, shippingAddress: action.payload },
+            };
+        case SAVE_PAYMENT_METHOD:
+            return {
+                ...state,
+                cart: { ...state.cart, shippingMethod: action.payload },
             };
         default:
             return state;
