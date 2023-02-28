@@ -14,22 +14,31 @@ import {
     List,
     ListItem,
     Link,
+    CircularProgress,
 } from '@mui/material';
 import NextLink from 'next/link';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import useStyles from '@/utils/styles';
 import CheckoutWizard from '@/components/CheckoutWizard';
+import { useSnackbar } from 'notistack';
+import { getError } from '@/utils/error';
+import axios from 'axios';
+import { CART_CLEAR } from '@/constants/types';
+import Cookies from 'js-cookie';
 
 function PlaceOrderScreen() {
     const { state, dispatch } = useContext(Store);
     const {
         cart: { cartItems, shippingAddress, paymentMethod },
+        userInfo,
     } = state;
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
     const classes = useStyles();
+    const { closeSnackbar, enqueueSnackbar } = useSnackbar();
     const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100;
     const itemsPrice = round2(
         cartItems.reduce((total, item) => total + item.quantity * item.price, 0)
@@ -38,11 +47,45 @@ function PlaceOrderScreen() {
     const taxPrice = round2(itemsPrice * 0.15);
     const totalPrice = round2(itemsPrice + shippingPrice + taxPrice);
 
+    const placeOrderHandler = async () => {
+        closeSnackbar();
+        try {
+            setLoading(true);
+            const { data } = await axios.post(
+                '/api/orders',
+                {
+                    orderItems: cartItems,
+                    shippingAddress,
+                    paymentMethod,
+                    itemsPrice,
+                    shippingPrice,
+                    taxPrice,
+                    totalPrice,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${userInfo.token}`,
+                    },
+                }
+            );
+            dispatch({ type: CART_CLEAR });
+            Cookies.remove('cartItems');
+            setLoading(false);
+            router.push(`/order/${data._id}`);
+        } catch (error) {
+            setLoading(false);
+            enqueueSnackbar(getError(error), { variant: 'error' });
+        }
+    };
+
     useEffect(() => {
         if (!paymentMethod) {
             router.push('/payment');
         }
-    }, [paymentMethod, router]);
+        if (cartItems.length === 0) {
+            router.push('/cart');
+        }
+    }, [paymentMethod, router, cartItems.length]);
 
     return (
         <Layout title="Place Order">
@@ -209,10 +252,16 @@ function PlaceOrderScreen() {
                                     variant="contained"
                                     color="primary"
                                     fullWidth
+                                    onClick={placeOrderHandler}
                                 >
                                     Place Order
                                 </Button>
                             </ListItem>
+                            {loading && (
+                                <ListItem>
+                                    <CircularProgress />
+                                </ListItem>
+                            )}
                         </List>
                     </Card>
                 </Grid>
