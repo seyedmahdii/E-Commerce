@@ -85,7 +85,7 @@ function PlaceOrderScreen() {
         if (cartItems.length === 0) {
             router.push('/cart');
         }
-    }, [paymentMethod, router, cartItems.length]);
+    }, []);
 
     return (
         <Layout title="Place Order">

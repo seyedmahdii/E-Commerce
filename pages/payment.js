@@ -37,7 +37,7 @@ export default function Payment() {
         if (!paymentMethod) {
             enqueueSnackbar('Payment method is required', { variant: 'error' });
         } else {
-            dispatch({ type: SAVE_PAYMENT_METHOD, action: paymentMethod });
+            dispatch({ type: SAVE_PAYMENT_METHOD, payload: paymentMethod });
             Cookies.set('paymentMethod', paymentMethod);
             router.push('/placeOrder');
         }
@@ -49,7 +49,7 @@ export default function Payment() {
         } else {
             setPaymentMethod(Cookies.get('paymentMethod') || '');
         }
-    }, [router, shippingAddress.address]);
+    }, []);
 
     return (
         <Layout title="Payment Method">
