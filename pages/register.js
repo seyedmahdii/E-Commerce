@@ -1,5 +1,6 @@
 import Layout from '@/components/Layout';
 import { USER_REGISTER } from '@/constants/types';
+import { getError } from '@/utils/error';
 import { Store } from '@/utils/Store';
 import useStyles from '@/utils/styles';
 import {
@@ -54,12 +55,7 @@ export default function RegisterScreen() {
             Cookies.set('userInfo', JSON.stringify(data));
             router.push(redirect || '/');
         } catch (error) {
-            enqueueSnackbar(
-                error.response?.data
-                    ? error.response.data?.message
-                    : error.message,
-                { variant: 'error' }
-            );
+            enqueueSnackbar(getError(error), { variant: 'error' });
         }
     };
 
